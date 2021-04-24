@@ -542,7 +542,7 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!43 &1292477096
+--- !u!43 &1077456577
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -705,7 +705,7 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!43 &1436514510
+--- !u!43 &1627682466
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -969,6 +969,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6ac6c076bd62a64f8b9d77644c2425c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  path: []
   caveWidth: 10
   pointDensity: 7
   noiseIntensity: 24.7

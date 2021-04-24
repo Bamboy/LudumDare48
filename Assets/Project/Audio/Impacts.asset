@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbd48c8921594544f8f3bb84ba04af82, type: 3}
+  m_Name: Impacts
+  m_EditorClassIdentifier: 
+  sounds:
+  - {fileID: 8300000, guid: d5b0b71190da7654fb9fbb5de4629a63, type: 3}
+  - {fileID: 8300000, guid: a1024653145e5f246b59f1a7eae281ed, type: 3}
+  - {fileID: 8300000, guid: c9495b23f9c4acd43b1041ae70ad6128, type: 3}
+  - {fileID: 8300000, guid: 6924fa342ab74f64ab0d303865ecff7b, type: 3}

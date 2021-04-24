@@ -6,7 +6,7 @@ using Sirenix.OdinInspector;
 // [ExecuteInEditMode]
 public class TerrainController : MonoBehaviour
 {
-    List<Vector2> path;
+    public List<Vector2> path;
 
     [Range(3, 100)]
     public float caveWidth = 3;
