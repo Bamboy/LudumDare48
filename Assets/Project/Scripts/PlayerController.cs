@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem boostParticles;
 
     Rigidbody2D rb;
+    float torqueAxis;
+    float thrustAxis;
 
     void Start()
     {
@@ -20,32 +21,42 @@ public class PlayerController : MonoBehaviour
         boostParticles.Stop();
     }
 
+    void OnRotate(InputValue value)
+    {
+        torqueAxis = -value.Get<float>();
+    }
+
+    void OnThrust(InputValue value)
+    {
+        thrustAxis = value.Get<float>();
+    }
+
+    void OnReset()
+    {
+        transform.position = Vector2.zero;
+        rb.velocity = Vector2.up * 15;
+        rb.rotation = 0;
+        rb.angularVelocity = 0;
+    }
+
+    void OnQuit()
+    {
+        Application.Quit();
+    }
+
     void FixedUpdate()
     {
-        float destAngle = 0;
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            destAngle += maxAngle;
-        }
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            destAngle -= maxAngle;
-        }
+        rb.AddTorque(torqueAxis * angleSpeed * Time.deltaTime);
 
-        float angle = Mathf.LerpAngle(transform.eulerAngles.z, destAngle, Time.deltaTime * angleSpeed);
-        transform.eulerAngles = Vector3.forward * angle;
-
-        if (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.UpArrow))
+        if (thrustAxis > 0)
         {
             Vector2 dir = Quaternion.AngleAxis(transform.eulerAngles.z, Vector3.forward) * Vector2.up;
-            rb.AddForce(dir * boostSpeed * Time.deltaTime);
-
+            rb.AddForce(dir * boostSpeed * thrustAxis * Time.deltaTime);
             boostParticles.Play();
         }
         else
         {
             rb.velocity = new Vector2(rb.velocity.x * horizontalDragFactor, rb.velocity.y);
-
             boostParticles.Stop();
         }
 
