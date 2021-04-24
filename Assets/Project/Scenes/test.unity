@@ -236,7 +236,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pc2D: {fileID: 286185484}
-  ShakePresets: []
+  ShakePresets:
+  - {fileID: 11400000, guid: 6c47cdba9ce634971ba9d84eb91de2d4, type: 2}
   ConstantShakePresets: []
   StartConstantShakePreset: {fileID: 0}
   CurrentConstantShakePreset: {fileID: 0}
@@ -401,7 +402,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 21300000, guid: c3f43f75e37804546b3a97e23a003f7a, type: 3}
-  segmentSpacingMax: 4
+  segmentSpacingMax: 5
   segmentCount: 20
   head: {fileID: 1019705831}
 --- !u!4 &298028944
@@ -429,7 +430,7 @@ PrefabInstance:
     - target: {fileID: 5903239183032340112, guid: 30c7638deabfdfb46bd7ae1dfa0fc8a8,
         type: 3}
       propertyPath: m_Simulated
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5903239183032340114, guid: 30c7638deabfdfb46bd7ae1dfa0fc8a8,
         type: 3}
