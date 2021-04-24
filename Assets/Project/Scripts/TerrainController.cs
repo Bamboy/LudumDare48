@@ -1,16 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.U2D;
 
 using Sirenix.OdinInspector;
 
-[ExecuteInEditMode]
+// [ExecuteInEditMode]
 public class TerrainController : MonoBehaviour
 {
-    SpriteShapeController ssc;
-    ShadowCaster2DController shadowCaster2DController;
-
     List<Vector2> path;
 
     [Range(3, 100)]
@@ -22,30 +17,35 @@ public class TerrainController : MonoBehaviour
     [Range(1, 100)]
     public float noiseIntensity = 1;
 
-    List<Vector2> leftPoints;
-    List<Vector2> rightPoints;
+    [Range(0.01f, 1f)]
+    public float noiseFactor = 1;
+
+    List<Vector2> bottomPoints;
+    List<Vector2> topPoints;
+
+    public TerrainSection topSection;
+    public TerrainSection bottomSection;
 
     [Button]
     void Start()
     {
-        ssc = GetComponent<SpriteShapeController>();
-        shadowCaster2DController = GetComponent<ShadowCaster2DController>();
-
         path = new List<Vector2>();
+        path.Add(Vector2.up * 1000);
         path.Add(Vector2.zero);
-        path.Add(new Vector2(-100, -100));
-        path.Add(new Vector2(-300, -150));
+        path.Add(new Vector2(100, -100));
+        path.Add(new Vector2(300, -150));
+        path.Add(new Vector2(300, -300));
 
-        leftPoints = new List<Vector2>();
-        rightPoints = new List<Vector2>();
+        bottomPoints = new List<Vector2>();
+        topPoints = new List<Vector2>();
 
         UpdateTerrain();
     }
 
     public void UpdateTerrain()
     {
-        leftPoints.Clear();
-        rightPoints.Clear();
+        bottomPoints.Clear();
+        topPoints.Clear();
 
         float pathLength = Vector2.Distance(path[0], path[1]);
         for (int i = 1; i < path.Count; i++)
@@ -76,77 +76,99 @@ public class TerrainController : MonoBehaviour
             {
                 Vector2 point = Vector2.Lerp(path[i - 1], path[i], j / segment.magnitude);
                 float distanceAlongPath = pathLength + Vector2.Distance(path[i - 1], point);
-                float leftNoise = Mathf.PerlinNoise(distanceAlongPath, 0) * noiseIntensity;
-                float rightNoise = Mathf.PerlinNoise(distanceAlongPath, 100) * noiseIntensity;
+                float bottomNoise = Mathf.PerlinNoise(distanceAlongPath * noiseFactor, 0) * noiseIntensity;
+                float topNoise = Mathf.PerlinNoise(distanceAlongPath * noiseFactor, 100) * noiseIntensity;
 
-                Vector2 leftPoint = point - ((perp * caveWidth) + (perp * leftNoise));
-                Vector2 rightPoint = point + ((perp * caveWidth) + (perp * rightNoise));
+                Vector2 bottomPoint = point - ((perp * caveWidth) + (perp * bottomNoise));
+                Vector2 topPoint = point + ((perp * caveWidth) + (perp * topNoise));
 
-                if (!isLeft(path[i - 1], path[i - 1] + startPerpCutoff, leftPoint) && isLeft(path[i], path[i] + endPerpCutoff, leftPoint))
+                if (!isLeft(path[i - 1], path[i - 1] + startPerpCutoff, bottomPoint) && isLeft(path[i], path[i] + endPerpCutoff, bottomPoint))
                 {
-                    leftPoints.Add(leftPoint);
+                    bottomPoints.Add(bottomPoint);
                 }
-                if (!isLeft(path[i - 1], path[i - 1] + startPerpCutoff, rightPoint) && isLeft(path[i], path[i] + endPerpCutoff, rightPoint))
+                if (!isLeft(path[i - 1], path[i - 1] + startPerpCutoff, topPoint) && isLeft(path[i], path[i] + endPerpCutoff, topPoint))
                 {
-                    rightPoints.Add(rightPoint);
+                    topPoints.Add(topPoint);
                 }
             }
 
             pathLength += segment.magnitude;
         }
+
+        float skirtPadding = 100;
+        topPoints.Insert(0, topPoints[0] + Vector2.one * skirtPadding);
+        topPoints.Add(topPoints[topPoints.Count - 1] + new Vector2(1, -1) * skirtPadding);
+        bottomPoints.Insert(0, bottomPoints[0] + -Vector2.one * skirtPadding);
+        bottomPoints.Add(bottomPoints[bottomPoints.Count - 1] + -Vector2.one * skirtPadding);
+
+        Vector2 topMax = new Vector2(float.MinValue, float.MinValue);
+        foreach (Vector2 p in topPoints)
+        {
+            if (p.x > topMax.x)
+            {
+                topMax = new Vector2(p.x, topMax.y);
+            }
+            if (p.y > topMax.y)
+            {
+                topMax = new Vector2(topMax.x, p.y);
+            }
+        }
+
+        Vector2 bottomMin = new Vector2(float.MaxValue, float.MaxValue);
+        foreach (Vector2 p in bottomPoints)
+        {
+            if (p.x < bottomMin.x)
+            {
+                bottomMin = new Vector2(p.x, bottomMin.y);
+            }
+            if (p.y < bottomMin.y)
+            {
+                bottomMin = new Vector2(bottomMin.x, p.y);
+            }
+        }
+
+        topPoints.Insert(0, topMax);
+        bottomPoints.Insert(0, bottomMin);
+
+        topSection.UpdateSpline(topPoints);
+        bottomSection.UpdateSpline(bottomPoints);
     }
 
     void Update()
     {
+#if UNITY_EDITOR
         UpdateTerrain();
+#endif
 
         for (int i = 1; i < path.Count; i++)
         {
             Debug.DrawLine(path[i - 1], path[i], Color.white);
         }
 
-        for (int i = 1; i < leftPoints.Count; i++)
+        for (int i = 1; i < bottomPoints.Count; i++)
         {
-            Debug.DrawLine(leftPoints[i - 1], leftPoints[i], Color.blue);
+            Debug.DrawLine(bottomPoints[i - 1], bottomPoints[i], Color.blue);
         }
 
-        for (int i = 1; i < rightPoints.Count; i++)
+        for (int i = 1; i < topPoints.Count; i++)
         {
-            Debug.DrawLine(rightPoints[i - 1], rightPoints[i], Color.red);
+            Debug.DrawLine(topPoints[i - 1], topPoints[i], Color.red);
         }
 
     }
 
-    void OnDrawGizmos()
-    {
-        foreach (Vector2 p in leftPoints)
-        {
-            DebugExtension.DrawPoint(p, Color.blue);
-        }
+    // void OnDrawGizmos()
+    // {
+    //     foreach (Vector2 p in bottomPoints)
+    //     {
+    //         DebugExtension.DrawPoint(p, Color.blue);
+    //     }
 
-        foreach (Vector2 p in rightPoints)
-        {
-            DebugExtension.DrawPoint(p, Color.red);
-        }
-    }
-
-    void UpdateSpline()
-    {
-        ssc.spline.Clear();
-
-        List<Vector2> points = new List<Vector2>();
-        points.Add(new Vector2(-1, -1));
-        points.Add(new Vector2(-1, 1));
-        points.Add(new Vector2(1, 1));
-        points.Add(new Vector2(1, -1));
-
-        for (int i = 0; i < points.Count; i++)
-        {
-            ssc.spline.InsertPointAt(i, points[i]);
-        }
-
-        shadowCaster2DController.UpdateShadowFromPoints(points.ToArray());
-    }
+    //     foreach (Vector2 p in topPoints)
+    //     {
+    //         DebugExtension.DrawPoint(p, Color.red);
+    //     }
+    // }
 
     public bool isLeft(Vector2 a, Vector2 b, Vector2 c)
     {
