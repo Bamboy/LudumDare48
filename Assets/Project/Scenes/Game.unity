@@ -166,9 +166,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f873734731614c4e91a7c131d4cb6e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boostSpeed: 1000
-  angleSpeed: 5
-  maxAngle: 45
+  boostSpeed: 3200
+  horizontalDragFactor: 0.98
+  angleSpeed: 3
+  maxAngle: 90
 --- !u!50 &404103095
 Rigidbody2D:
   serializedVersion: 4
