@@ -9,11 +9,15 @@ public class PlayerController : MonoBehaviour
     public float angleSpeed;
     public float maxAngle;
 
+    public ParticleSystem boostParticles;
+
     Rigidbody2D rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        boostParticles.Stop();
     }
 
     void FixedUpdate()
@@ -35,10 +39,14 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 dir = Quaternion.AngleAxis(transform.eulerAngles.z, Vector3.forward) * Vector2.up;
             rb.AddForce(dir * boostSpeed * Time.deltaTime);
+
+            boostParticles.Play();
         }
         else
         {
             rb.velocity = new Vector2(rb.velocity.x * horizontalDragFactor, rb.velocity.y);
+
+            boostParticles.Stop();
         }
 
 
