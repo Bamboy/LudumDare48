@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Experimental.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
@@ -59,7 +60,5 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x * horizontalDragFactor, rb.velocity.y);
             boostParticles.Stop();
         }
-
-
     }
 }
