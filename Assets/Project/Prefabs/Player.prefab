@@ -4876,6 +4876,7 @@ MonoBehaviour:
   angleSpeed: 1000
   maxAngle: 90
   boostParticles: {fileID: 5903239182500658958}
+  velocityShakeThreshold: 20
 --- !u!60 &5903239183032340126
 PolygonCollider2D:
   m_ObjectHideFlags: 0

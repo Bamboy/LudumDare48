@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Experimental.Rendering.Universal;
+using Com.LuisPedroFonseca.ProCamera2D;
 
 public class PlayerController : MonoBehaviour
 {
@@ -60,5 +61,15 @@ public class PlayerController : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x * horizontalDragFactor, rb.velocity.y);
             boostParticles.Stop();
         }
+    }
+
+    public float velocityShakeThreshold = 10f;
+    private ProCamera2DShake shaker;
+    private void OnCollisionEnter2D( Collision2D collision )
+    {
+        if( shaker == null )
+            shaker = ProCamera2D.Instance.GetComponent<ProCamera2DShake>();
+        if( collision.relativeVelocity.magnitude > velocityShakeThreshold )
+            shaker.Shake(0.3f, collision.relativeVelocity);
     }
 }
