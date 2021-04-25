@@ -9,10 +9,20 @@ public class WormController : MonoBehaviour
 
     [ChildGameObjectsOnly]
     public Transform head;
+    private WormVisuals visuals;
+
 
     public float speed = 0.8f;
+    public float chasePlayerDistance = 30f;
+    
 
-    private WormVisuals visuals;
+    
+
+
+    public float headRotateSpeed = 4f;
+    private float headAngle;
+
+    public bool initalized;
 
     private void Awake()
     {
@@ -20,27 +30,42 @@ public class WormController : MonoBehaviour
         if( Singleton == null )
             Singleton = this;
     }
-
-
-
-    public bool isChasing;
     public void StartChasing( Vector3 spawnPosition )
     {
-        isChasing = true;
+        initalized = true;
         visuals.CreateBody();
         visuals.MoveBody( spawnPosition );
-        
     }
 
-    
+
+
     void Update()
     {
-        if( isChasing == false )
+        if( initalized == false )
             return;
 
         int index = TerrainController.Singleton.ClosestSegmentIndexToPoint( head.transform.position );
         index = Mathf.Min( index + 1, TerrainController.Singleton.path.Count - 1 );
-        head.transform.position = Vector3.MoveTowards( head.transform.position, TerrainController.Singleton.path[ index ], speed );
 
+        Vector3 target;
+
+        if( Vector3.Distance( head.position, PlayerController.Singleton.transform.position ) < chasePlayerDistance )
+            target = PlayerController.Singleton.transform.position;
+        else
+            target = TerrainController.Singleton.path[ index ];
+
+        head.position = Vector3.MoveTowards( head.position, target, speed );
+
+        float a = VectorExtras.VectorToDegrees( VectorExtras.Direction( head.position, target ) );
+        headAngle = Mathf.MoveTowardsAngle( headAngle, a, headRotateSpeed );
+        head.transform.rotation = Quaternion.AngleAxis( headAngle, Vector3.forward );
+
+        Debug.DrawLine(head.position, target, Color.cyan);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere( head.position, chasePlayerDistance );
     }
 }

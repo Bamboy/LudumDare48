@@ -280,7 +280,7 @@ public class TerrainController : MonoBehaviour
             AddPath();
             UpdateTerrain();
 
-            if( WormController.Singleton.isChasing == false )
+            if( WormController.Singleton.initalized == false )
                 WormController.Singleton.StartChasing( path[0] );
         }
 
