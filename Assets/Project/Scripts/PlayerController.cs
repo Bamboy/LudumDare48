@@ -5,6 +5,8 @@ using Com.LuisPedroFonseca.ProCamera2D;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController Singleton { get; private set; }
+
     public float boostSpeed;
     public float horizontalDragFactor = 1;
     public float angleSpeed;
@@ -17,6 +19,11 @@ public class PlayerController : MonoBehaviour
     float torqueAxis;
     float thrustAxis;
 
+    private void Awake()
+    {
+        if( Singleton == null )
+            Singleton = this;
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
