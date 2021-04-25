@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     public ParticleSystem boostParticles;
 
+    AudioSource audio;
     Rigidbody2D rb;
     float torqueAxis;
     float thrustAxis;
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        audio = GetComponent<AudioSource>();
 
         boostParticles.Stop();
     }
@@ -46,6 +48,12 @@ public class PlayerController : MonoBehaviour
         Application.Quit();
     }
 
+
+    private void Update()
+    {
+        audio.volume = thrustAxis * 0.6f;
+    }
+
     void FixedUpdate()
     {
         rb.AddTorque(torqueAxis * angleSpeed * Time.deltaTime);
@@ -63,6 +71,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public Asteroidians.Assets.AudioSet impactAudios;
     public float velocityShakeThreshold = 10f;
     private ProCamera2DShake shaker;
     private void OnCollisionEnter2D( Collision2D collision )
@@ -70,6 +79,9 @@ public class PlayerController : MonoBehaviour
         if( shaker == null )
             shaker = ProCamera2D.Instance.GetComponent<ProCamera2DShake>();
         if( collision.relativeVelocity.magnitude > velocityShakeThreshold )
-            shaker.Shake(0.3f, collision.relativeVelocity);
+        {
+            shaker.Shake( 0.4f, collision.relativeVelocity );
+            AudioSource.PlayClipAtPoint( impactAudios.GetRandom(), transform.position );
+        }
     }
 }
