@@ -11,14 +11,24 @@ public class WormController : MonoBehaviour
     public Transform head;
     private WormVisuals visuals;
 
+    public float maxSpeed = 60f;
+    public float minSpeed = 40f;
+    public float maxSpeedDistance = 100f;
+    public float minSpeedDistance = 20f;
 
-    public float speed = 0.8f;
+    public AnimationCurve speedCurve;
+
     public float chasePlayerDistance = 30f;
     
-    public float headRotateSpeed = 4f;
+    public float headRotateSpeed = 100f;
     private float headAngle;
 
+    [ReadOnly]
     public bool initalized;
+    [ReadOnly]
+    public float speed;
+
+    private float distToPlayer;
 
     private void Awake()
     {
@@ -33,8 +43,6 @@ public class WormController : MonoBehaviour
         visuals.MoveBody( spawnPosition );
     }
 
-
-
     void Update()
     {
         if( initalized == false )
@@ -44,11 +52,19 @@ public class WormController : MonoBehaviour
         index = Mathf.Min( index + 1, TerrainController.Singleton.path.Count - 1 );
 
         Vector3 target;
-
         if( Vector3.Distance( head.position, PlayerController.Singleton.transform.position ) < chasePlayerDistance )
             target = PlayerController.Singleton.transform.position;
         else
-            target = TerrainController.Singleton.path[ index ];
+            target = TerrainController.Singleton.path[ index ] + (Vector2)TerrainController.Singleton.transform.position;
+        
+        float myDistance = TerrainController.Singleton.PointDistanceAlongPathTotal( head.position );
+        float playerDistance = TerrainController.Singleton.PointDistanceAlongPathTotal( PlayerController.Singleton.transform.position );
+        distToPlayer = playerDistance - myDistance;
+
+        float percent = VectorExtras.ReverseLerp(distToPlayer, minSpeedDistance, maxSpeedDistance);
+        float curve = speedCurve.Evaluate( percent ) * (maxSpeed - minSpeed);
+        speed = curve + minSpeed; //VectorExtras.Remap( minSpeedDistance, maxSpeedDistance, minSpeed, maxSpeed, diff );
+
 
         head.position = Vector3.MoveTowards( head.position, target, speed * Time.deltaTime );
 
@@ -59,9 +75,23 @@ public class WormController : MonoBehaviour
         Debug.DrawLine(head.position, target, Color.cyan);
     }
 
+#if UNITY_EDITOR
+    private void OnGUI()
+    {
+        GUILayout.BeginArea( new Rect(8, 8, 300, 80) );
+        GUILayout.BeginVertical();
+
+        GUILayout.TextArea(string.Format("Worm Speed: {0:N2}", speed));
+        GUILayout.TextArea(string.Format("Worm Dist: {0:N2}", distToPlayer));
+        //GUILayout.TextArea(string.Format("Worm Dist: {0:N2}", speed));
+        GUILayout.EndVertical();
+        //GUILayout.EndArea();
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere( head.position, chasePlayerDistance );
     }
+#endif
 }

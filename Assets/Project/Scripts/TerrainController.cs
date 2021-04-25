@@ -304,7 +304,7 @@ public class TerrainController : MonoBehaviour
         return currentSegmentIndex;
     }
 
-    float PointDistanceAlongPath(Vector2 point)
+    public float PointDistanceAlongPath(Vector2 point)
     {
         int currentSegmentIndex = ClosestSegmentIndexToPoint(point);
 
@@ -319,7 +319,7 @@ public class TerrainController : MonoBehaviour
         return distance;
     }
 
-    float PointDistanceAlongPathTotal(Vector2 point)
+    public float PointDistanceAlongPathTotal(Vector2 point)
     {
         return PointDistanceAlongPath(point) + previousChunksDistance;
     }
