@@ -3,22 +3,34 @@ using UnityEngine;
 
 using Sirenix.OdinInspector;
 
-// [ExecuteInEditMode]
+[ExecuteInEditMode]
 public class TerrainController : MonoBehaviour
 {
     public List<Vector2> path;
 
-    [Range(3, 100)]
-    public float caveWidth = 3;
-
-    [Range(1, 10)]
-    public int pointDensity = 1;
-
     [Range(1, 100)]
-    public float noiseIntensity = 1;
+    public float caveWidth = 1;
+
+    [Range(1, 300)]
+    public int numPathPoints = 1;
+
+    [Range(1, 1000)]
+    public int pathPointDensity = 1;
+
+    [Range(1, 1000)]
+    public float pathNoiseIntensity = 1;
 
     [Range(0.01f, 1f)]
-    public float noiseFactor = 1;
+    public float pathNoiseFactor = 1;
+
+    [Range(1, 100)]
+    public int terrainPointDensity = 1;
+
+    [Range(1, 100)]
+    public float terrainNoiseIntensity = 1;
+
+    [Range(0.01f, 1f)]
+    public float terrainNoiseFactor = 1;
 
     List<Vector2> bottomPoints;
     List<Vector2> topPoints;
@@ -26,20 +38,29 @@ public class TerrainController : MonoBehaviour
     public TerrainSection topSection;
     public TerrainSection bottomSection;
 
+    public Transform playerTransform;
+
     [Button]
     void Start()
     {
-        path = new List<Vector2>();
-        path.Add(Vector2.up * 1000);
-        path.Add(Vector2.zero);
-        path.Add(new Vector2(100, -100));
-        path.Add(new Vector2(300, -150));
-        path.Add(new Vector2(300, -300));
-
+        UpdatePath();
         bottomPoints = new List<Vector2>();
         topPoints = new List<Vector2>();
 
         UpdateTerrain();
+    }
+
+    void UpdatePath()
+    {
+        path = new List<Vector2>();
+        path.Add(Vector2.zero);
+
+        for (int i = 0; i < numPathPoints; i++)
+        {
+            float noise = Mathf.PerlinNoise(i * pathNoiseFactor, 1337) * 2 - 1;
+            Vector2 point = new Vector2(1, -0.5f) * i * pathPointDensity + (Vector2.one * noise * pathNoiseIntensity);
+            path.Add(point);
+        }
     }
 
     public void UpdateTerrain()
@@ -69,15 +90,15 @@ public class TerrainController : MonoBehaviour
                 endPerpCutoff = ((endPerpCutoff + nextPerp) / 2).normalized;
             }
 
-            Debug.DrawLine(path[i - 1], path[i - 1] + startPerpCutoff * 100, Color.magenta);
-            Debug.DrawLine(path[i], path[i] + endPerpCutoff * 100, Color.cyan);
+            // Debug.DrawLine(path[i - 1], path[i - 1] + startPerpCutoff * 100, Color.magenta);
+            // Debug.DrawLine(path[i], path[i] + endPerpCutoff * 100, Color.cyan);
 
-            for (int j = 0; j < segment.magnitude; j += pointDensity)
+            for (int j = 0; j < segment.magnitude; j += terrainPointDensity)
             {
                 Vector2 point = Vector2.Lerp(path[i - 1], path[i], j / segment.magnitude);
                 float distanceAlongPath = pathLength + Vector2.Distance(path[i - 1], point);
-                float bottomNoise = Mathf.PerlinNoise(distanceAlongPath * noiseFactor, 0) * noiseIntensity;
-                float topNoise = Mathf.PerlinNoise(distanceAlongPath * noiseFactor, 100) * noiseIntensity;
+                float bottomNoise = Mathf.PerlinNoise(distanceAlongPath * terrainNoiseFactor, 0) * terrainNoiseIntensity;
+                float topNoise = Mathf.PerlinNoise(distanceAlongPath * terrainNoiseFactor, 100) * terrainNoiseIntensity;
 
                 Vector2 bottomPoint = point - ((perp * caveWidth) + (perp * bottomNoise));
                 Vector2 topPoint = point + ((perp * caveWidth) + (perp * topNoise));
@@ -130,13 +151,17 @@ public class TerrainController : MonoBehaviour
         topPoints.Insert(0, topMax);
         bottomPoints.Insert(0, bottomMin);
 
-        topSection.UpdateSpline(topPoints);
-        bottomSection.UpdateSpline(bottomPoints);
+        if (Application.isPlaying)
+        {
+            topSection.UpdateSpline(topPoints);
+            bottomSection.UpdateSpline(bottomPoints);
+        }
     }
 
     void Update()
     {
 #if UNITY_EDITOR
+        UpdatePath();
         UpdateTerrain();
 #endif
 
@@ -154,6 +179,24 @@ public class TerrainController : MonoBehaviour
         {
             Debug.DrawLine(topPoints[i - 1], topPoints[i], Color.red);
         }
+
+    }
+
+    void GetPlayerDistance()
+    {
+        float shortestDistance = float.MaxValue;
+        int currentSegmentIndex = 0;
+        for (int i = 1; i < path.Count; i++)
+        {
+            Vector2 projectedPos = VectorExtras.ProjectPointOnLineSegment(path[i], path[i - 1], playerTransform.position);
+            float dist = Vector2.Distance(projectedPos, playerTransform.position);
+            if (dist < shortestDistance)
+            {
+                shortestDistance = dist;
+                currentSegmentIndex = i;
+            }
+        }
+
 
     }
 

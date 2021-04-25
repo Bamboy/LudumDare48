@@ -79,10 +79,11 @@ SpriteShapeRenderer:
   m_Color: {r: 0.23584908, g: 0.13911982, b: 0.07231222, a: 1}
   m_MaskInteraction: 0
   m_ShapeTexture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
-  m_Sprites: []
+  m_Sprites:
+  - {fileID: 21300000, guid: 20468a009a591e2439a9d85f6869298a, type: 3}
   m_LocalAABB:
-    m_Center: {x: 0, y: -0.00000011920929, z: 0}
-    m_Extent: {x: 1.0000001, y: 1, z: 0}
+    m_Center: {x: 0, y: 0.9999999, z: -0.00014999999}
+    m_Extent: {x: 3.56, y: 2.56, z: 0.00014999999}
 --- !u!114 &5951833911317479850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,7 +138,7 @@ MonoBehaviour:
   m_SpriteShape: {fileID: 11400000, guid: b4cf6db904b5bad4bafac6fd4c0a5fc2, type: 2}
   m_FillPixelPerUnit: 100
   m_StretchTiling: 1
-  m_SplineDetail: 16
+  m_SplineDetail: 4
   m_AdaptiveUV: 1
   m_StretchUV: 0
   m_WorldSpaceUV: 0
@@ -165,13 +166,15 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0
   m_Points:
-  - {x: -1, y: -1}
-  - {x: -1, y: 1}
-  - {x: 1, y: 1}
-  - {x: 1, y: -1}
-  - {x: -0.90281487, y: -1}
-  - {x: -0.97451854, y: -1}
-  - {x: -1, y: -1}
+  - {x: -1.00512, y: -1}
+  - {x: -1.00512, y: 1}
+  - {x: -0.4814814, y: 1.0051199}
+  - {x: 1, y: 1.00512}
+  - {x: 1.0051199, y: 0.4814814}
+  - {x: 1.00512, y: -1}
+  - {x: 0.4814814, y: -0.9999999}
+  - {x: -0.48148155, y: -1}
+  - {x: -1.00512, y: -1}
 --- !u!114 &5951833911317479848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,16 +194,16 @@ MonoBehaviour:
   m_SelfShadows: 0
   m_ApplyToSortingLayers: 
   m_ShapePath:
-  - {x: -1, y: -1, z: 0}
-  - {x: -1, y: 1, z: 0}
-  - {x: 1, y: 1, z: 0}
-  - {x: 1, y: -1, z: 0}
+  - {x: -1.00512, y: -1, z: 0}
+  - {x: -1.00512, y: 1, z: 0}
+  - {x: 1, y: 1.00512, z: 0}
+  - {x: 1.00512, y: -1, z: 0}
   - {x: -0.90281487, y: -1, z: 0}
   - {x: -0.97451854, y: -1, z: 0}
-  - {x: -1, y: -1, z: 0}
-  m_ShapePathHash: -1904734689
+  - {x: -1.00512, y: -1, z: 0}
+  m_ShapePathHash: 1001771551
   m_Mesh: {fileID: 0}
-  m_InstanceId: 26770
+  m_InstanceId: -76754
 --- !u!114 &5951833911317479855
 MonoBehaviour:
   m_ObjectHideFlags: 0
