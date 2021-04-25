@@ -3,7 +3,7 @@ using UnityEngine;
 
 using Sirenix.OdinInspector;
 
-//[ExecuteInEditMode]
+[ExecuteInEditMode]
 public class TerrainController : MonoBehaviour
 {
     public List<Vector2> path;
@@ -14,23 +14,19 @@ public class TerrainController : MonoBehaviour
     [Range(1, 300)]
     public int segmentsPerChunk = 1;
 
-    [Range(1, 1000)]
+    [Range(1, 100)]
     public int segmentLength = 1;
 
-    [Range(1, 1000)]
-    public float pathNoiseIntensity = 1;
+    public float pathNoiseScale = 0;
+    public int pathNoiseOctaves = 4;
+    public float pathNoisePersistence = 0.5f;
+    public float pathNoiseLacunarity = 2;
 
-    [Range(0.01f, 1f)]
-    public float pathNoiseFactor = 1;
-
-    [Range(1, 100)]
     public int terrainPointDensity = 1;
-
-    [Range(1, 100)]
-    public float terrainNoiseIntensity = 1;
-
-    [Range(0.01f, 1f)]
-    public float terrainNoiseFactor = 1;
+    public int terrainNoiseScale = 1;
+    public int terrainNoiseOctaves = 4;
+    public float terrainNoisePersistence = 0.5f;
+    public float terrainNoiseLacunarity = 2;
 
     List<Vector2> bottomPoints;
     List<Vector2> topPoints;
@@ -42,25 +38,19 @@ public class TerrainController : MonoBehaviour
 
     float previousChunksDistance;
 
+    public bool autoUpdatePath = true;
+
     [ReadOnly]
     public int overallIndex = 0;
-    //public float chunkLoadDistance = 10;
 
     void Start()
     {
-        overallIndex = 0;
-        if( path == null )
-        {
-            path = new List<Vector2>();
-            path.Add(new Vector2(-segmentLength, segmentLength));
-            path.Add(Vector2.zero);
-        }
-
-        AddPath();
-        AddPath();
-
         bottomPoints = new List<Vector2>();
         topPoints = new List<Vector2>();
+
+        Reset();
+
+        playerTransform.position = path[3];
 
         UpdateTerrain();
     }
@@ -70,16 +60,17 @@ public class TerrainController : MonoBehaviour
         for (int i = 0; i < segmentsPerChunk; i++)
         {
             int ind = i + overallIndex;
-            float noise = Mathf.PerlinNoise(ind * pathNoiseFactor, 1337) * 2 - 1;
-            Vector2 point = new Vector2(1, -0.5f) * ind * segmentLength + (Vector2.one * noise * pathNoiseIntensity);
+            float noise = Perlin1D(ind, pathNoiseScale, pathNoiseOctaves, pathNoisePersistence, pathNoiseLacunarity);
+            Vector2 point = new Vector2(1, -1) * ind * segmentLength + (Vector2.one * noise);
             path.Add(point);
         }
         overallIndex += segmentsPerChunk;
     }
+
     void RemovePath()
     {
         float distance = 0;
-        for (int i = 1; i < segmentsPerChunk; i++)
+        for (int i = 1; i < segmentsPerChunk + 1; i++)
         {
             distance += Vector2.Distance(path[i - 1], path[i]);
         }
@@ -89,12 +80,35 @@ public class TerrainController : MonoBehaviour
         path.RemoveRange(0, segmentsPerChunk);
     }
 
+    float Perlin1D(float x, float scale, int octaves, float persistence, float lacunarity, float shift = 0)
+    {
+        if (scale <= 0)
+        {
+            scale = 0.0001f;
+        }
+
+        float amplitude = 1;
+        float frequency = 1;
+        float result = 0;
+
+        for (int i = 0; i < octaves; i++)
+        {
+            float sample = x / scale * frequency;
+            float value = Mathf.PerlinNoise(sample, shift) * 2 - 1;
+            result += value * amplitude;
+            amplitude *= persistence;
+            frequency *= lacunarity;
+        }
+
+        return result;
+    }
+
     public void UpdateTerrain()
     {
         bottomPoints.Clear();
         topPoints.Clear();
 
-        float pathLength = Vector2.Distance(path[0], path[1]);
+        float pathLength = 0;
         for (int i = 1; i < path.Count; i++)
         {
             Vector2 segment = path[i] - path[i - 1];
@@ -122,9 +136,10 @@ public class TerrainController : MonoBehaviour
             for (int j = 0; j < segment.magnitude; j += terrainPointDensity)
             {
                 Vector2 point = Vector2.Lerp(path[i - 1], path[i], j / segment.magnitude);
-                float distanceAlongPath = pathLength + Vector2.Distance(path[i - 1], point);
-                float bottomNoise = Mathf.PerlinNoise(distanceAlongPath * terrainNoiseFactor, 0) * terrainNoiseIntensity;
-                float topNoise = Mathf.PerlinNoise(distanceAlongPath * terrainNoiseFactor, 100) * terrainNoiseIntensity;
+
+                float sample = previousChunksDistance + pathLength + Vector2.Distance(path[i - 1], point);
+                float bottomNoise = Perlin1D(sample, terrainNoiseScale, terrainNoiseOctaves, terrainNoisePersistence, terrainNoiseLacunarity, 0);
+                float topNoise = Perlin1D(sample, terrainNoiseScale, terrainNoiseOctaves, terrainNoisePersistence, terrainNoiseLacunarity, 100);
 
                 Vector2 bottomPoint = point - ((perp * caveWidth) + (perp * bottomNoise));
                 Vector2 topPoint = point + ((perp * caveWidth) + (perp * topNoise));
@@ -142,7 +157,7 @@ public class TerrainController : MonoBehaviour
             pathLength += segment.magnitude;
         }
 
-        float skirtPadding = 100;
+        float skirtPadding = 500;
         topPoints.Insert(0, topPoints[0] + Vector2.one * skirtPadding);
         topPoints.Add(topPoints[topPoints.Count - 1] + new Vector2(1, -1) * skirtPadding);
         bottomPoints.Insert(0, bottomPoints[0] + new Vector2(-1, 1) * skirtPadding);
@@ -184,16 +199,26 @@ public class TerrainController : MonoBehaviour
         }
     }
 
-    void Update()
+    [Button]
+    void Reset()
     {
-        /*
-#if UNITY_EDITOR
+        previousChunksDistance = 0;
+        overallIndex = 0;
         path = new List<Vector2>();
-        path.Add(new Vector2(-segmentLength, segmentLength));
-        path.Add(Vector2.zero);
+        AddPath();
         AddPath();
         UpdateTerrain();
-#endif */
+    }
+
+    void Update()
+    {
+
+#if UNITY_EDITOR
+        if (autoUpdatePath && !Application.isPlaying)
+        {
+            Reset();
+        }
+#endif 
 
         for (int i = 1; i < path.Count; i++)
         {
@@ -210,18 +235,17 @@ public class TerrainController : MonoBehaviour
             Debug.DrawLine(topPoints[i - 1], topPoints[i], Color.red);
         }
 
-        if( Application.isPlaying )
-        {
-            Vector2 playerPos = PlayerController.Singleton.transform.position;
-            int currentSegmentIndex = ClosestSegmentIndexToPoint( playerPos );
 
-            if( currentSegmentIndex > segmentsPerChunk + (segmentsPerChunk / 2) )
-            {
-                AddPath();
-                RemovePath();
-                UpdateTerrain();
-            }
+        Vector2 playerPos = playerTransform.position;
+        int currentSegmentIndex = ClosestSegmentIndexToPoint(playerPos);
+
+        if (currentSegmentIndex > segmentsPerChunk + (segmentsPerChunk / 2.0f))
+        {
+            RemovePath();
+            AddPath();
+            UpdateTerrain();
         }
+
     }
 
     int ClosestSegmentIndexToPoint(Vector2 point)
@@ -256,9 +280,15 @@ public class TerrainController : MonoBehaviour
 
         return distance;
     }
-    float PointDistanceAlongPathTotal( Vector2 point )
+
+    float PointDistanceAlongPathTotal(Vector2 point)
     {
         return PointDistanceAlongPath(point) + previousChunksDistance;
+    }
+
+    public float GetPlayerDistance()
+    {
+        return PointDistanceAlongPathTotal(playerTransform.position);
     }
 
     Vector2 ClosestPointAlongPath(Vector2 point)
@@ -269,8 +299,8 @@ public class TerrainController : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if( Application.isPlaying == false )
-            return;
+        // if (Application.isPlaying == false)
+        //     return;
 
         DebugExtension.DrawPoint(ClosestPointAlongPath(playerTransform.position), Color.cyan);
 
