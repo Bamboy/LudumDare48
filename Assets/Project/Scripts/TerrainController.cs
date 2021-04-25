@@ -6,6 +6,8 @@ using Sirenix.OdinInspector;
 [ExecuteInEditMode]
 public class TerrainController : MonoBehaviour
 {
+    public static TerrainController Singleton { get; private set; }
+
     public List<Vector2> path;
 
     [Range(1, 100)]
@@ -45,6 +47,12 @@ public class TerrainController : MonoBehaviour
     [ReadOnly]
     public int overallIndex = 0;
 
+    private void Awake()
+    {
+        if( Singleton == null )
+            Singleton = this;
+    }
+
     void Start()
     {
         bottomPoints = new List<Vector2>();
@@ -56,6 +64,22 @@ public class TerrainController : MonoBehaviour
 
         UpdateTerrain();
     }
+
+#if UNITY_EDITOR
+    private bool _ShowPathButton() { return Application.isPlaying; }
+    [Button][EnableIf( "_ShowPathButton" )]
+    void AddPathButton()
+    {
+        AddPath();
+        UpdateTerrain();
+    }
+    [Button][EnableIf( "_ShowPathButton" )]
+    void RemovePathButton()
+    {
+        RemovePath();
+        UpdateTerrain();
+    }
+#endif
 
     void AddPath()
     {
@@ -255,11 +279,14 @@ public class TerrainController : MonoBehaviour
             RemovePath();
             AddPath();
             UpdateTerrain();
+
+            if( WormController.Singleton.isChasing == false )
+                WormController.Singleton.StartChasing( path[0] );
         }
 
     }
 
-    int ClosestSegmentIndexToPoint(Vector2 point)
+    public int ClosestSegmentIndexToPoint(Vector2 point)
     {
         float shortestDistance = float.MaxValue;
         int currentSegmentIndex = 0;

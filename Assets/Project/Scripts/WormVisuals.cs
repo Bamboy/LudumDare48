@@ -21,6 +21,9 @@ public class WormVisuals : MonoBehaviour
     {
         segments = new List<GameObject>();
         positions = new List<Vector3>();
+    }
+    public void CreateBody()
+    {
         head.sortingOrder = segmentCount+1;
 
         for( int i = 0; i < segmentCount; i++ )
@@ -35,11 +38,25 @@ public class WormVisuals : MonoBehaviour
             segments.Add( obj );
             positions.Add( Vector3.zero );
         }
+    }
 
+    /// <summary>
+    /// Moves the entire body
+    /// </summary>
+    public void MoveBody( Vector3 position )
+    {
+        head.transform.position = position;
+        for( int i = 0; i < positions.Count; i++ )
+        {
+            positions[i] = position;
+        }
     }
 
     void Update()
     {
+        if( positions == null || positions.Count <= 0 || segments == null || segments.Count <= 0 )
+            return;
+
         positions[0] = VectorExtras.AnchoredMovePosTowardTarget( head.transform.position, positions[0], segmentSpacingMax );
         
         float a = Vector2.Angle( segments[0].transform.position, head.transform.position );
