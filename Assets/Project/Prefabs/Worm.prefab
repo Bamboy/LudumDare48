@@ -105,7 +105,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3300964618847776037}
   - component: {fileID: 3300964618847776042}
-  - component: {fileID: 8669263535294663858}
+  - component: {fileID: 4283683461853005865}
   m_Layer: 0
   m_Name: head
   m_TagString: Worm
@@ -177,8 +177,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &8669263535294663858
-CircleCollider2D:
+--- !u!60 &4283683461853005865
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -187,9 +187,38 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 16
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 32, y: 32}
+    newSize: {x: 2.56, y: 2.56}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 1.4582214, y: -0.6161728}
+      - {x: 1.7649155, y: -4.882431}
+      - {x: 5.1266747, y: -8.642014}
+      - {x: 11.5581455, y: -10.293121}
+      - {x: 6.297985, y: -14.084908}
+      - {x: 0.076164246, y: -15.184662}
+      - {x: -5.620262, y: -14.287624}
+      - {x: -11.061813, y: -10.583939}
+      - {x: -14.162182, y: -5.861328}
+      - {x: -15.27, y: 0}
+      - {x: -14.348492, y: 4.848213}
+      - {x: -11.369698, y: 10.042801}
+      - {x: -6.5511093, y: 13.892075}
+      - {x: -0.69122237, y: 15.367737}
+      - {x: 4.4072876, y: 14.8804245}
+      - {x: 8.459705, y: 12.795166}
+      - {x: 11.349731, y: 9.95034}
+      - {x: 8.651421, y: 9.781212}
+      - {x: 6.2648525, y: 8.522453}
+      - {x: 4.14478, y: 5.102806}
