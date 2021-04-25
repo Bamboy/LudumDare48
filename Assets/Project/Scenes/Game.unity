@@ -988,10 +988,23 @@ PrefabInstance:
       propertyPath: chasePlayerDistance
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 1980822078, guid: ef0da826666313940af1b077f02e79f6, type: 3}
+      propertyPath: headRotateSpeed
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 1980822078, guid: ef0da826666313940af1b077f02e79f6, type: 3}
+      propertyPath: speed
+      value: 60
+      objectReference: {fileID: 0}
     - target: {fileID: 3300964618528693056, guid: ef0da826666313940af1b077f02e79f6,
         type: 3}
       propertyPath: m_Name
       value: Worm
+      objectReference: {fileID: 0}
+    - target: {fileID: 3300964618528693059, guid: ef0da826666313940af1b077f02e79f6,
+        type: 3}
+      propertyPath: bodyRotateSpeed
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 3300964618528693085, guid: ef0da826666313940af1b077f02e79f6,
         type: 3}

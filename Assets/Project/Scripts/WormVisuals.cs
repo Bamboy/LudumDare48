@@ -11,16 +11,19 @@ public class WormVisuals : MonoBehaviour
     //public float randomVariance = 1;
     public float segmentSpacingMax = 5f;
     public int segmentCount = 10;
+    public float bodyRotateSpeed = 5f;
 
     [ChildGameObjectsOnly]
     public SpriteRenderer head;
 
     List<GameObject> segments;
     List<Vector3> positions;
+    List<float> angles;
     void Start()
     {
         segments = new List<GameObject>();
         positions = new List<Vector3>();
+        angles = new List<float>();
     }
     public void CreateBody()
     {
@@ -37,6 +40,7 @@ public class WormVisuals : MonoBehaviour
             obj.transform.localPosition = new Vector3(-segmentSpacingMax, 0f, 0f);
             segments.Add(obj);
             positions.Add(Vector3.zero);
+            angles.Add( 0f );
         }
     }
 
@@ -49,6 +53,7 @@ public class WormVisuals : MonoBehaviour
         for (int i = 0; i < positions.Count; i++)
         {
             positions[i] = position;
+            angles[i] = 0;
         }
     }
 
@@ -59,20 +64,22 @@ public class WormVisuals : MonoBehaviour
 
         positions[0] = VectorExtras.AnchoredMovePosTowardTarget(head.transform.position, positions[0], segmentSpacingMax);
 
-        float a = Vector2.Angle(segments[0].transform.position, head.transform.position);
-        segments[0].transform.rotation = Quaternion.AngleAxis(a, Vector3.forward);
+        float ang = VectorExtras.VectorToDegrees( VectorExtras.Direction( segments[0].transform.position, head.transform.position ) );
+        angles[0] = Mathf.MoveTowardsAngle( angles[0], ang, bodyRotateSpeed * Time.deltaTime );
+        segments[0].transform.rotation = Quaternion.AngleAxis(angles[0], Vector3.forward);
         segments[0].transform.position = positions[0];
 
         Vector3 nextPos = VectorExtras.AnchoredMovePosTowardTarget(head.transform.position, positions[0], segmentSpacingMax);
         for (int i = 1; i < segments.Count; i++)
         {
-            positions[i] = VectorExtras.AnchoredMovePosTowardTarget(nextPos, positions[i], segmentSpacingMax);
+            positions[i] = VectorExtras.AnchoredMovePosTowardTarget(nextPos, positions[i], segmentSpacingMax / 3f);
 
-            float ang = Vector2.Angle(segments[i].transform.position, nextPos);
-            segments[i].transform.rotation = Quaternion.AngleAxis(ang, Vector3.forward);
+            ang = VectorExtras.VectorToDegrees( VectorExtras.Direction( segments[i].transform.position, nextPos ) );
+            angles[i] = Mathf.MoveTowardsAngle( angles[i], ang, bodyRotateSpeed * Time.deltaTime );
+            segments[i].transform.rotation = Quaternion.AngleAxis(angles[i], Vector3.forward);
             segments[i].transform.position = positions[i];
-            // + new Vector3(UnityEngine.Random.Range(-randomVariance, randomVariance),UnityEngine.Random.Range(-randomVariance, randomVariance),0f)
-            nextPos = VectorExtras.AnchoredMovePosTowardTarget(positions[i - 1], positions[i], segmentSpacingMax);
+
+            nextPos = VectorExtras.AnchoredMovePosTowardTarget(positions[i - 1], positions[i], segmentSpacingMax / 3f);
         }
 
     }

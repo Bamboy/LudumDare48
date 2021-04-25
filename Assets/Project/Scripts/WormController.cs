@@ -15,10 +15,6 @@ public class WormController : MonoBehaviour
     public float speed = 0.8f;
     public float chasePlayerDistance = 30f;
     
-
-    
-
-
     public float headRotateSpeed = 4f;
     private float headAngle;
 
@@ -54,10 +50,10 @@ public class WormController : MonoBehaviour
         else
             target = TerrainController.Singleton.path[ index ];
 
-        head.position = Vector3.MoveTowards( head.position, target, speed );
+        head.position = Vector3.MoveTowards( head.position, target, speed * Time.deltaTime );
 
         float a = VectorExtras.VectorToDegrees( VectorExtras.Direction( head.position, target ) );
-        headAngle = Mathf.MoveTowardsAngle( headAngle, a, headRotateSpeed );
+        headAngle = Mathf.MoveTowardsAngle( headAngle, a, headRotateSpeed * Time.deltaTime );
         head.transform.rotation = Quaternion.AngleAxis( headAngle, Vector3.forward );
 
         Debug.DrawLine(head.position, target, Color.cyan);
