@@ -18,12 +18,14 @@ public class TerrainController : MonoBehaviour
     public int segmentLength = 1;
 
     public float pathNoiseScale = 0;
+    [Range(1, 8)]
     public int pathNoiseOctaves = 4;
     public float pathNoisePersistence = 0.5f;
     public float pathNoiseLacunarity = 2;
 
     public int terrainPointDensity = 1;
     public int terrainNoiseScale = 1;
+    [Range(1, 8)]
     public int terrainNoiseOctaves = 4;
     public float terrainNoisePersistence = 0.5f;
     public float terrainNoiseLacunarity = 2;
@@ -50,7 +52,7 @@ public class TerrainController : MonoBehaviour
 
         Reset();
 
-        playerTransform.position = path[3];
+        playerTransform.position = path[0];
 
         UpdateTerrain();
     }
@@ -191,6 +193,15 @@ public class TerrainController : MonoBehaviour
 
         topPoints.Insert(0, topMax);
         bottomPoints.Insert(0, bottomMin);
+
+        // float tolerance = 0.1f;
+        // List<Vector2> simplifiedTopPoints = new List<Vector2>();
+        // List<Vector2> simplifiedBottomPoints = new List<Vector2>();
+        // LineUtility.Simplify(topPoints, tolerance, simplifiedTopPoints);
+        // LineUtility.Simplify(bottomPoints, tolerance, simplifiedBottomPoints);
+
+        // topPoints = simplifiedTopPoints;
+        // bottomPoints = simplifiedBottomPoints;
 
         if (Application.isPlaying)
         {
