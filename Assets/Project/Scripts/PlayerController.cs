@@ -70,7 +70,7 @@ public class PlayerController : MonoBehaviour
             boostParticles.Stop();
         }
     }
-
+    public AudioClip impactSingle;
     public Asteroidians.Assets.AudioSet impactAudios;
     public float velocityShakeThreshold = 10f;
     private ProCamera2DShake shaker;
@@ -81,6 +81,7 @@ public class PlayerController : MonoBehaviour
         if( collision.relativeVelocity.magnitude > velocityShakeThreshold )
         {
             shaker.Shake( 0.4f, collision.relativeVelocity );
+            AudioSource.PlayClipAtPoint( impactSingle, transform.position );
             AudioSource.PlayClipAtPoint( impactAudios.GetRandom(), transform.position );
         }
     }

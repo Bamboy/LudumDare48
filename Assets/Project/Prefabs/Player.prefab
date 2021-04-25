@@ -4877,6 +4877,7 @@ MonoBehaviour:
   angleSpeed: 1000
   maxAngle: 90
   boostParticles: {fileID: 5903239182500658958}
+  impactSingle: {fileID: 8300000, guid: 01a62bbcd1de36841ad510a86a03a267, type: 3}
   impactAudios: {fileID: 11400000, guid: e5bce9e6e65dba548b929eba027454f3, type: 2}
   velocityShakeThreshold: 20
 --- !u!60 &5903239183032340126
