@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 018ec79b6436fcc4c97afbd6d2c599bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 21300000, guid: c3f43f75e37804546b3a97e23a003f7a, type: 3}
+  body: {fileID: 21300000, guid: f3898bc72e8f8ac469f51e43876c32e5, type: 3}
   segmentSpacingMax: 5
   segmentCount: 20
   head: {fileID: 3300964618847776042}
@@ -137,7 +137,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: bf514691d332eb848846a09a094cdfa3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 406a2182a794daf458198070a8cc7b00, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
