@@ -92,4 +92,12 @@ public class PlayerController : MonoBehaviour
             AudioSource.PlayClipAtPoint( impactAudios.GetRandom(), transform.position );
         }
     }
+
+    private void OnTriggerEnter2D( Collider2D other )
+    {
+        if( other.tag == "Worm" )
+        {
+            Debug.Log("Nom!");
+        }
+    }
 }
