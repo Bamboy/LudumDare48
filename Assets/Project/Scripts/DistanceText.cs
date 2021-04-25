@@ -16,6 +16,6 @@ public class DistanceText : MonoBehaviour
     void Update()
     {
         float distance = terrain.GetPlayerDistance();
-        text.text = string.Format("Distance\n{0:N0} km", distance);
+        text.text = string.Format("{0:N0}", distance);
     }
 }
