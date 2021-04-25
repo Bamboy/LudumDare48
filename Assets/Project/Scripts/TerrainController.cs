@@ -12,10 +12,10 @@ public class TerrainController : MonoBehaviour
     public float caveWidth = 1;
 
     [Range(1, 300)]
-    public int numPathPoints = 1;
+    public int segmentsPerChunk = 1;
 
     [Range(1, 1000)]
-    public int pathPointDensity = 1;
+    public int segmentLength = 1;
 
     [Range(1, 1000)]
     public float pathNoiseIntensity = 1;
@@ -40,10 +40,13 @@ public class TerrainController : MonoBehaviour
 
     public Transform playerTransform;
 
+    float previousChunksDistance;
+
     [Button]
     void Start()
     {
         UpdatePath();
+
         bottomPoints = new List<Vector2>();
         topPoints = new List<Vector2>();
 
@@ -53,12 +56,13 @@ public class TerrainController : MonoBehaviour
     void UpdatePath()
     {
         path = new List<Vector2>();
+        path.Add(new Vector2(-segmentLength, segmentLength));
         path.Add(Vector2.zero);
 
-        for (int i = 0; i < numPathPoints; i++)
+        for (int i = 0; i < segmentsPerChunk; i++)
         {
             float noise = Mathf.PerlinNoise(i * pathNoiseFactor, 1337) * 2 - 1;
-            Vector2 point = new Vector2(1, -0.5f) * i * pathPointDensity + (Vector2.one * noise * pathNoiseIntensity);
+            Vector2 point = new Vector2(1, -0.5f) * i * segmentLength + (Vector2.one * noise * pathNoiseIntensity);
             path.Add(point);
         }
     }
@@ -119,7 +123,7 @@ public class TerrainController : MonoBehaviour
         float skirtPadding = 100;
         topPoints.Insert(0, topPoints[0] + Vector2.one * skirtPadding);
         topPoints.Add(topPoints[topPoints.Count - 1] + new Vector2(1, -1) * skirtPadding);
-        bottomPoints.Insert(0, bottomPoints[0] + -Vector2.one * skirtPadding);
+        bottomPoints.Insert(0, bottomPoints[0] + new Vector2(-1, 1) * skirtPadding);
         bottomPoints.Add(bottomPoints[bottomPoints.Count - 1] + -Vector2.one * skirtPadding);
 
         Vector2 topMax = new Vector2(float.MinValue, float.MinValue);
@@ -182,14 +186,14 @@ public class TerrainController : MonoBehaviour
 
     }
 
-    void GetPlayerDistance()
+    int ClosestSegmentIndexToPoint(Vector2 point)
     {
         float shortestDistance = float.MaxValue;
         int currentSegmentIndex = 0;
         for (int i = 1; i < path.Count; i++)
         {
-            Vector2 projectedPos = VectorExtras.ProjectPointOnLineSegment(path[i], path[i - 1], playerTransform.position);
-            float dist = Vector2.Distance(projectedPos, playerTransform.position);
+            Vector2 projectedPos = VectorExtras.ProjectPointOnLineSegment(path[i - 1], path[i], point);
+            float dist = Vector2.Distance(projectedPos, point);
             if (dist < shortestDistance)
             {
                 shortestDistance = dist;
@@ -197,21 +201,44 @@ public class TerrainController : MonoBehaviour
             }
         }
 
-
+        return currentSegmentIndex;
     }
 
-    // void OnDrawGizmos()
-    // {
-    //     foreach (Vector2 p in bottomPoints)
-    //     {
-    //         DebugExtension.DrawPoint(p, Color.blue);
-    //     }
+    float PointDistanceAlongPath(Vector2 point)
+    {
+        int currentSegmentIndex = ClosestSegmentIndexToPoint(point);
 
-    //     foreach (Vector2 p in topPoints)
-    //     {
-    //         DebugExtension.DrawPoint(p, Color.red);
-    //     }
-    // }
+        float distance = 0;
+        for (int i = 1; i < currentSegmentIndex; i++)
+        {
+            distance += Vector2.Distance(path[i - 1], path[i]);
+        }
+        Vector2 projected = VectorExtras.ProjectPointOnLineSegment(path[currentSegmentIndex - 1], path[currentSegmentIndex], point);
+        distance += Vector2.Distance(path[currentSegmentIndex - 1], projected);
+
+        return distance;
+    }
+
+    Vector2 ClosestPointAlongPath(Vector2 point)
+    {
+        int currentSegmentIndex = ClosestSegmentIndexToPoint(point);
+        return VectorExtras.ProjectPointOnLineSegment(path[currentSegmentIndex - 1], path[currentSegmentIndex], point);
+    }
+
+    void OnDrawGizmos()
+    {
+        DebugExtension.DrawPoint(ClosestPointAlongPath(playerTransform.position), Color.cyan);
+
+        foreach (Vector2 p in bottomPoints)
+        {
+            DebugExtension.DrawPoint(p, Color.blue);
+        }
+
+        foreach (Vector2 p in topPoints)
+        {
+            DebugExtension.DrawPoint(p, Color.red);
+        }
+    }
 
     public bool isLeft(Vector2 a, Vector2 b, Vector2 c)
     {
