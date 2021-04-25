@@ -8,6 +8,9 @@ public class TerrainController : MonoBehaviour
 {
     public static TerrainController Singleton { get; private set; }
 
+    public bool updateSeed = true;
+    public int seed;
+
     public List<Vector2> path;
 
     [Range(1, 100)]
@@ -49,7 +52,7 @@ public class TerrainController : MonoBehaviour
 
     private void Awake()
     {
-        if( Singleton == null )
+        if (Singleton == null)
             Singleton = this;
     }
 
@@ -59,21 +62,20 @@ public class TerrainController : MonoBehaviour
         topPoints = new List<Vector2>();
 
         Reset();
-
-        playerTransform.position = path[0];
-
         UpdateTerrain();
     }
 
 #if UNITY_EDITOR
     private bool _ShowPathButton() { return Application.isPlaying; }
-    [Button][EnableIf( "_ShowPathButton" )]
+    [Button]
+    [EnableIf("_ShowPathButton")]
     void AddPathButton()
     {
         AddPath();
         UpdateTerrain();
     }
-    [Button][EnableIf( "_ShowPathButton" )]
+    [Button]
+    [EnableIf("_ShowPathButton")]
     void RemovePathButton()
     {
         RemovePath();
@@ -87,7 +89,19 @@ public class TerrainController : MonoBehaviour
         {
             int ind = i + overallIndex;
             float noise = Perlin1D(ind, pathNoiseScale, pathNoiseOctaves, pathNoisePersistence, pathNoiseLacunarity);
-            Vector2 point = new Vector2(1, -1) * ind * segmentLength + (Vector2.one * noise);
+            Vector2 point;
+            if (ind == 0)
+            {
+                point = Vector2.zero;
+            }
+            else if (ind == 1)
+            {
+                point = Vector2.down * segmentLength;
+            }
+            else
+            {
+                point = Vector2.down * ind * segmentLength + (Vector2.right * noise);
+            }
             path.Add(point);
         }
         overallIndex += segmentsPerChunk;
@@ -120,7 +134,7 @@ public class TerrainController : MonoBehaviour
         for (int i = 0; i < octaves; i++)
         {
             float sample = x / scale * frequency;
-            float value = Mathf.PerlinNoise(sample, shift) * 2 - 1;
+            float value = Mathf.PerlinNoise(sample, shift + seed) * 2 - 1;
             result += value * amplitude;
             amplitude *= persistence;
             frequency *= lacunarity;
@@ -183,49 +197,15 @@ public class TerrainController : MonoBehaviour
             pathLength += segment.magnitude;
         }
 
-        float skirtPadding = 500;
-        topPoints.Insert(0, topPoints[0] + Vector2.one * skirtPadding);
-        topPoints.Add(topPoints[topPoints.Count - 1] + new Vector2(1, -1) * skirtPadding);
-        bottomPoints.Insert(0, bottomPoints[0] + new Vector2(-1, 1) * skirtPadding);
-        bottomPoints.Add(bottomPoints[bottomPoints.Count - 1] + -Vector2.one * skirtPadding);
+        float skirtPadding = 1000;
 
-        Vector2 topMax = new Vector2(float.MinValue, float.MinValue);
-        foreach (Vector2 p in topPoints)
-        {
-            if (p.x > topMax.x)
-            {
-                topMax = new Vector2(p.x, topMax.y);
-            }
-            if (p.y > topMax.y)
-            {
-                topMax = new Vector2(topMax.x, p.y);
-            }
-        }
+        topPoints.Insert(0, topPoints[0] + Vector2.right * skirtPadding);
+        topPoints.Add(topPoints[topPoints.Count - 1] + Vector2.down * skirtPadding);
+        topPoints.Add(topPoints[topPoints.Count - 1] + Vector2.right * skirtPadding);
 
-        Vector2 bottomMin = new Vector2(float.MaxValue, float.MaxValue);
-        foreach (Vector2 p in bottomPoints)
-        {
-            if (p.x < bottomMin.x)
-            {
-                bottomMin = new Vector2(p.x, bottomMin.y);
-            }
-            if (p.y < bottomMin.y)
-            {
-                bottomMin = new Vector2(bottomMin.x, p.y);
-            }
-        }
-
-        topPoints.Insert(0, topMax);
-        bottomPoints.Insert(0, bottomMin);
-
-        // float tolerance = 0.1f;
-        // List<Vector2> simplifiedTopPoints = new List<Vector2>();
-        // List<Vector2> simplifiedBottomPoints = new List<Vector2>();
-        // LineUtility.Simplify(topPoints, tolerance, simplifiedTopPoints);
-        // LineUtility.Simplify(bottomPoints, tolerance, simplifiedBottomPoints);
-
-        // topPoints = simplifiedTopPoints;
-        // bottomPoints = simplifiedBottomPoints;
+        bottomPoints.Insert(0, bottomPoints[0] + Vector2.left * skirtPadding);
+        bottomPoints.Add(bottomPoints[bottomPoints.Count - 1] + Vector2.down * skirtPadding);
+        bottomPoints.Add(bottomPoints[bottomPoints.Count - 1] + Vector2.left * skirtPadding);
 
         if (Application.isPlaying)
         {
@@ -237,12 +217,20 @@ public class TerrainController : MonoBehaviour
     [Button]
     void Reset()
     {
+        if (updateSeed)
+        {
+            seed = (int)System.DateTime.Now.Ticks;
+        }
+
         previousChunksDistance = 0;
         overallIndex = 0;
         path = new List<Vector2>();
+
         AddPath();
         AddPath();
         UpdateTerrain();
+
+        transform.position = -(Vector3)path[0];
     }
 
     void Update()
@@ -255,19 +243,21 @@ public class TerrainController : MonoBehaviour
         }
 #endif 
 
+        Vector2 pos = transform.position;
+
         for (int i = 1; i < path.Count; i++)
         {
-            Debug.DrawLine(path[i - 1], path[i], Color.white);
+            Debug.DrawLine(pos + path[i - 1], pos + path[i], Color.white);
         }
 
         for (int i = 1; i < bottomPoints.Count; i++)
         {
-            Debug.DrawLine(bottomPoints[i - 1], bottomPoints[i], Color.blue);
+            Debug.DrawLine(pos + bottomPoints[i - 1], pos + bottomPoints[i], Color.blue);
         }
 
         for (int i = 1; i < topPoints.Count; i++)
         {
-            Debug.DrawLine(topPoints[i - 1], topPoints[i], Color.red);
+            Debug.DrawLine(pos + topPoints[i - 1], pos + topPoints[i], Color.red);
         }
 
 
@@ -280,8 +270,8 @@ public class TerrainController : MonoBehaviour
             AddPath();
             UpdateTerrain();
 
-            if( WormController.Singleton.initalized == false )
-                WormController.Singleton.StartChasing( path[0] );
+            if (WormController.Singleton.initalized == false)
+                WormController.Singleton.StartChasing(pos + path[0]);
         }
 
     }
@@ -340,16 +330,18 @@ public class TerrainController : MonoBehaviour
         // if (Application.isPlaying == false)
         //     return;
 
-        DebugExtension.DrawPoint(ClosestPointAlongPath(playerTransform.position), Color.cyan);
+        Vector2 pos = transform.position;
+
+        DebugExtension.DrawPoint(pos + ClosestPointAlongPath(playerTransform.position), Color.cyan);
 
         foreach (Vector2 p in bottomPoints)
         {
-            DebugExtension.DrawPoint(p, Color.blue);
+            DebugExtension.DrawPoint(pos + p, Color.blue);
         }
 
         foreach (Vector2 p in topPoints)
         {
-            DebugExtension.DrawPoint(p, Color.red);
+            DebugExtension.DrawPoint(pos + p, Color.red);
         }
     }
 

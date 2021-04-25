@@ -7,31 +7,32 @@ using Com.LuisPedroFonseca.ProCamera2D;
 public class Parallax : MonoBehaviour
 {
     public bool repeat = true;
-
     public float speed = 1;
-
+    SpriteRenderer spriteRenderer;
     private float width;
     private float startPos;
 
     void Start()
     {
+        spriteRenderer = GetComponent<SpriteRenderer>();
         startPos = transform.position.x;
-        width = GetComponent<SpriteRenderer>().bounds.size.x;
+        width = spriteRenderer.bounds.size.x;
+
     }
 
     void LateUpdate()
     {
         float dist = ProCamera2D.Instance.transform.position.x * speed;
 
-        transform.position = new Vector3( startPos + dist, transform.position.y, transform.position.z );
+        transform.position = new Vector3(startPos + dist, transform.position.y, transform.position.z);
 
-        if( repeat )
+        if (repeat)
         {
             float tmp = ProCamera2D.Instance.transform.position.x * (1f - speed);
 
-            if( tmp > startPos + width )
+            if (tmp > startPos + width)
                 startPos += width;
-            else if( tmp < startPos - width )
+            else if (tmp < startPos - width)
                 startPos -= width;
         }
     }
