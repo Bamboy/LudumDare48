@@ -14,7 +14,12 @@ public class TerrainController : MonoBehaviour
     public List<Vector2> path;
 
     [Range(1, 100)]
-    public float caveWidth = 1;
+    public float startingCaveWidth = 1;
+
+    [Range(1, 100)]
+    public float minCaveWidth = 1;
+
+    public float distanceToMinCaveWidth = 3000;
 
     [Range(1, 300)]
     public int segmentsPerChunk = 1;
@@ -171,6 +176,8 @@ public class TerrainController : MonoBehaviour
                 float sample = previousChunksDistance + pathLength + Vector2.Distance(path[i - 1], point);
                 float bottomNoise = Perlin1D(sample, terrainNoiseScale, terrainNoiseOctaves, terrainNoisePersistence, terrainNoiseLacunarity, 0);
                 float topNoise = Perlin1D(sample, terrainNoiseScale, terrainNoiseOctaves, terrainNoisePersistence, terrainNoiseLacunarity, 100);
+
+                float caveWidth = VectorExtras.Remap(0, distanceToMinCaveWidth, startingCaveWidth, minCaveWidth, sample);
 
                 Vector2 bottomPoint = point - ((perp * caveWidth) + (perp * bottomNoise));
                 Vector2 topPoint = point + ((perp * caveWidth) + (perp * topNoise));
