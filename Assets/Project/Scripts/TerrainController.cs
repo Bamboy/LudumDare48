@@ -28,6 +28,7 @@ public class TerrainController : MonoBehaviour
     public float pathNoisePersistence = 0.5f;
     public float pathNoiseLacunarity = 2;
 
+    [Range(1, 100)]
     public int terrainPointDensity = 1;
     public int terrainNoiseScale = 1;
     [Range(1, 8)]
@@ -90,18 +91,8 @@ public class TerrainController : MonoBehaviour
             int ind = i + overallIndex;
             float noise = Perlin1D(ind, pathNoiseScale, pathNoiseOctaves, pathNoisePersistence, pathNoiseLacunarity);
             Vector2 point;
-            if (ind == 0)
-            {
-                point = Vector2.zero;
-            }
-            else if (ind == 1)
-            {
-                point = Vector2.down * segmentLength;
-            }
-            else
-            {
-                point = Vector2.down * ind * segmentLength + (Vector2.right * noise);
-            }
+            float noiseFactor = VectorExtras.Remap(0, 100, 0, 1, ind);
+            point = Vector2.down * ind * segmentLength + (Vector2.right * noise * noiseFactor);
             path.Add(point);
         }
         overallIndex += segmentsPerChunk;
@@ -219,7 +210,7 @@ public class TerrainController : MonoBehaviour
     {
         if (updateSeed)
         {
-            seed = (int)System.DateTime.Now.Ticks;
+            seed = (int)System.DateTime.Now.Millisecond;
         }
 
         previousChunksDistance = 0;
