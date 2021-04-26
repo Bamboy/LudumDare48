@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        if( Singleton == null )
+        if (Singleton == null)
             Singleton = this;
     }
     void Start()
@@ -47,21 +47,23 @@ public class PlayerController : MonoBehaviour
 
     void OnReset()
     {
-        transform.position = Vector2.zero;
-        rb.velocity = Vector2.up * 15;
-        rb.rotation = 0;
-        rb.angularVelocity = 0;
+        Reset();
     }
 
     void OnQuit()
     {
+#if UNITY_WEBGL
+        Reset();
+#else
         Application.Quit();
+#endif
+
     }
 
 
     private void Update()
     {
-        if( Time.timeScale == 0f )
+        if (Time.timeScale == 0f)
             audio.volume = 0f;
         else
             audio.volume = thrustAxis * 0.6f;
@@ -87,42 +89,49 @@ public class PlayerController : MonoBehaviour
     public Asteroidians.Assets.AudioSet impactAudios;
     public float velocityShakeThreshold = 10f;
     private ProCamera2DShake shaker;
-    private void OnCollisionEnter2D( Collision2D collision )
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if( shaker == null )
+        if (shaker == null)
             shaker = ProCamera2D.Instance.GetComponent<ProCamera2DShake>();
-        if( collision.relativeVelocity.magnitude > velocityShakeThreshold )
+        if (collision.relativeVelocity.magnitude > velocityShakeThreshold)
         {
-            AudioSource.PlayClipAtPoint( impactSingle, transform.position );
-            AudioSource.PlayClipAtPoint( impactAudios.GetRandom(), transform.position );
-            StartCoroutine( ImpactCoroutine(collision.relativeVelocity) );
+            AudioSource.PlayClipAtPoint(impactSingle, transform.position);
+            AudioSource.PlayClipAtPoint(impactAudios.GetRandom(), transform.position);
+            StartCoroutine(ImpactCoroutine(collision.relativeVelocity));
         }
     }
 
-    IEnumerator ImpactCoroutine( Vector2 relVelocity )
+    IEnumerator ImpactCoroutine(Vector2 relVelocity)
     {
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(0.1f);
         Time.timeScale = 1f;
-        shaker.Shake( 0.3f, relVelocity, 10, 0.1f, -1, new Vector3(), 0.1f, true );
+        shaker.Shake(0.3f, relVelocity, 10, 0.1f, -1, new Vector3(), 0.1f, true);
     }
 
     public bool isDead = false;
-    private void OnTriggerEnter2D( Collider2D other )
+
+    void Reset()
     {
-        if( isDead )
+        FadeController.Singleton.FadeOut(delegate ()
+        {
+            SceneManager.LoadScene(0);
+        });
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (isDead)
             return;
 
-        if( other.tag == "Worm" )
+        if (other.tag == "Worm")
         {
             StopAllCoroutines();
 
-            Highscores.AddScore( Mathf.FloorToInt( TerrainController.Singleton.GetPlayerDistance() / 3f ) );
+            Highscores.AddScore(Mathf.FloorToInt(TerrainController.Singleton.GetPlayerDistance() / 3f));
             isDead = true;
+            Reset();
 
-            FadeController.Singleton.FadeOut( delegate() {
-                SceneManager.LoadScene(0);
-            });
         }
     }
 }

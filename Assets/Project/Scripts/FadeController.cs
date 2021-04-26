@@ -10,7 +10,7 @@ public class FadeController : MonoBehaviour
 {
     public static FadeController Singleton { get; private set; }
 
-    public float fadeDuration = 2.5f;
+    public float fadeDuration = 1.0f;
 
     private float fadeTimer;
     private float fadeTimerStart;
@@ -20,7 +20,7 @@ public class FadeController : MonoBehaviour
 
     private void Awake()
     {
-        if( Singleton == null )
+        if (Singleton == null)
             Singleton = this;
 
         fadePanel = GetComponent<Image>();
@@ -31,22 +31,22 @@ public class FadeController : MonoBehaviour
     }
 
     [Button]
-    public void FadeIn( Action onComplete = null )
+    public void FadeIn(Action onComplete = null)
     {
         onFadeDone = onComplete;
-        StartCoroutine( FadeInCoroutine() );
+        StartCoroutine(FadeInCoroutine());
     }
 
     IEnumerator FadeInCoroutine()
     {
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
         fadeTimerStart = Time.unscaledTime;
         fadeTimer = Time.unscaledTime + fadeDuration;
         fadePanel.enabled = true;
         fadePanel.color = Color.black;
-        while( true )
+        while (true)
         {
-            if( Time.unscaledTime > fadeTimer )
+            if (Time.unscaledTime > fadeTimer)
             {
                 fadePanel.enabled = false;
                 break;
@@ -59,16 +59,15 @@ public class FadeController : MonoBehaviour
             }
             yield return null;
         }
-        Time.timeScale = 1f;
-        if( onFadeDone != null )
+        if (onFadeDone != null)
             onFadeDone.Invoke();
     }
-    
+
     [Button]
-    public void FadeOut( Action onComplete = null )
+    public void FadeOut(Action onComplete = null)
     {
         onFadeDone = onComplete;
-        StartCoroutine( FadeOutCoroutine() );
+        StartCoroutine(FadeOutCoroutine());
     }
 
     IEnumerator FadeOutCoroutine()
@@ -78,10 +77,10 @@ public class FadeController : MonoBehaviour
         fadeTimer = Time.unscaledTime + fadeDuration;
         fadePanel.enabled = true;
         fadePanel.color = Color.clear;
-        while( true )
+        while (true)
         {
             yield return null;
-            if( Time.unscaledTime > fadeTimer )
+            if (Time.unscaledTime > fadeTimer)
             {
                 fadePanel.color = Color.black;
                 break;
@@ -93,7 +92,7 @@ public class FadeController : MonoBehaviour
             }
         }
         //Time.timeScale = 1f;
-        if( onFadeDone != null )
+        if (onFadeDone != null)
             onFadeDone.Invoke();
     }
 

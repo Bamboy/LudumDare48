@@ -195,7 +195,7 @@ public class TerrainController : MonoBehaviour
             pathLength += segment.magnitude;
         }
 
-        float skirtPadding = 1000;
+        float skirtPadding = 3000;
 
         topPoints.Insert(0, topPoints[0] + Vector2.right * skirtPadding);
         topPoints.Add(topPoints[topPoints.Count - 1] + Vector2.down * skirtPadding);
