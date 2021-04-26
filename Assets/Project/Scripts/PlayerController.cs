@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 using UnityEngine.Experimental.Rendering.Universal;
 using Com.LuisPedroFonseca.ProCamera2D;
@@ -112,9 +113,13 @@ public class PlayerController : MonoBehaviour
         if( other.tag == "Worm" )
         {
             StopAllCoroutines();
-            Time.timeScale = 0;
+
             Highscores.AddScore( Mathf.FloorToInt( TerrainController.Singleton.GetPlayerDistance() / 3f ) );
             isDead = true;
+
+            FadeController.Singleton.FadeOut( delegate() {
+                SceneManager.LoadScene(0);
+            });
         }
     }
 }
