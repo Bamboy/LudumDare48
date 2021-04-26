@@ -7,7 +7,8 @@ public class DistanceFadeIn : MonoBehaviour
 {
     public TerrainController terrain;
     TextMeshProUGUI text;
-
+    public float min = 10;
+    public float max = 80;
     void Start()
     {
         text = GetComponent<TextMeshProUGUI>();
@@ -16,7 +17,7 @@ public class DistanceFadeIn : MonoBehaviour
     void Update()
     {
         Color c = text.color;
-        c.a = VectorExtras.Remap(10, 80, 0, 1, terrain.GetPlayerDistance());
+        c.a = VectorExtras.Remap(min, max, 0, 1, terrain.GetPlayerDistance());
         text.color = c;
     }
 }

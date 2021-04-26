@@ -9558,7 +9558,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_RenderMode: 0
   m_SortMode: 0
   m_MinParticleSize: 0
@@ -14329,7 +14329,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_RenderMode: 0
   m_SortMode: 0
   m_MinParticleSize: 0
@@ -14480,6 +14480,7 @@ MonoBehaviour:
   impactSingle: {fileID: 8300000, guid: 01a62bbcd1de36841ad510a86a03a267, type: 3}
   impactAudios: {fileID: 11400000, guid: e5bce9e6e65dba548b929eba027454f3, type: 2}
   velocityShakeThreshold: 20
+  isDead: 0
 --- !u!60 &5903239183032340126
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -14505,17 +14506,19 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.5079463, y: 0.9173702}
-      - {x: 0.012455314, y: 1.0504124}
-      - {x: -0.40703297, y: 0.96752715}
-      - {x: -0.72552204, y: 0.6770403}
-      - {x: -0.7743858, y: -0.016381383}
-      - {x: -1.1785325, y: -0.50408816}
-      - {x: -1.1782544, y: -1.1429709}
-      - {x: 1.1637349, y: -1.1768503}
-      - {x: 1.1730328, y: -0.49243343}
-      - {x: 0.7284581, y: -0.0025470853}
-      - {x: 0.7284206, y: 0.6671706}
+    - - {x: 0.81744415, y: 0.94263494}
+      - {x: 0.454594, y: 1.1577885}
+      - {x: -0.021740913, y: 1.2517583}
+      - {x: -0.6468048, y: 1.105813}
+      - {x: -1.0034342, y: 0.7465183}
+      - {x: -1.0746826, y: 0.31394184}
+      - {x: -1.669011, y: -0.5741565}
+      - {x: -1.3646557, y: -1.2330598}
+      - {x: -0.011088848, y: -1.2400131}
+      - {x: 1.3309383, y: -1.2377518}
+      - {x: 1.6782494, y: -0.6446972}
+      - {x: 1.0695341, y: 0.28168505}
+      - {x: 1.0505489, y: 0.61032397}
 --- !u!82 &663404368
 AudioSource:
   m_ObjectHideFlags: 0
