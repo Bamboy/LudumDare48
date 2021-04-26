@@ -61,7 +61,10 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        audio.volume = thrustAxis * 0.6f;
+        if( Time.timeScale == 0f )
+            audio.volume = 0f;
+        else
+            audio.volume = thrustAxis * 0.6f;
     }
 
     void FixedUpdate()
