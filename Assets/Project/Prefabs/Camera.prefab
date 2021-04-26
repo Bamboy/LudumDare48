@@ -42,7 +42,7 @@ SpriteShapeRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -281,7 +281,7 @@ MonoBehaviour:
     TargetInfluenceH: 1
     TargetInfluenceV: 1
     TargetOffset: {x: 0, y: 0}
-  CenterTargetOnStart: 1
+  CenterTargetOnStart: 0
   Axis: 0
   UpdateType: 0
   FollowHorizontal: 1
