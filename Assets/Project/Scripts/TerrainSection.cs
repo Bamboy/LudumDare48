@@ -5,10 +5,12 @@ using UnityEngine.U2D;
 public class TerrainSection : MonoBehaviour
 {
     SpriteShapeController ssc;
+    ShadowCaster2DController scc;
 
     void Awake()
     {
         ssc = GetComponent<SpriteShapeController>();
+        scc = GetComponent<ShadowCaster2DController>();
     }
 
     public void UpdateSpline(List<Vector2> points)
@@ -18,6 +20,8 @@ public class TerrainSection : MonoBehaviour
         {
             ssc.spline.InsertPointAt(i, points[i]);
         }
+
+        scc.UpdateShadowFromPoints(points.ToArray());
     }
 
 }
