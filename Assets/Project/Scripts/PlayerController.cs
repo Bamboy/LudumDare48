@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Experimental.Rendering.Universal;
 using Com.LuisPedroFonseca.ProCamera2D;
@@ -87,11 +89,20 @@ public class PlayerController : MonoBehaviour
             shaker = ProCamera2D.Instance.GetComponent<ProCamera2DShake>();
         if( collision.relativeVelocity.magnitude > velocityShakeThreshold )
         {
-            shaker.Shake( 0.4f, collision.relativeVelocity );
             AudioSource.PlayClipAtPoint( impactSingle, transform.position );
             AudioSource.PlayClipAtPoint( impactAudios.GetRandom(), transform.position );
+            StartCoroutine( ImpactCoroutine(collision.relativeVelocity) );
         }
     }
+
+    IEnumerator ImpactCoroutine( Vector2 relVelocity )
+    {
+        Time.timeScale = 0f;
+        yield return new WaitForSecondsRealtime(0.1f);
+        Time.timeScale = 1f;
+        shaker.Shake( 0.3f, relVelocity, 10, 0.1f, -1, new Vector3(), 0.1f, true );
+    }
+
     public bool isDead = false;
     private void OnTriggerEnter2D( Collider2D other )
     {
@@ -100,6 +111,7 @@ public class PlayerController : MonoBehaviour
 
         if( other.tag == "Worm" )
         {
+            StopAllCoroutines();
             Time.timeScale = 0;
             Highscores.AddScore( Mathf.FloorToInt( TerrainController.Singleton.GetPlayerDistance() / 3f ) );
             isDead = true;
