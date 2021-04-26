@@ -78,7 +78,7 @@ public class WormController : MonoBehaviour
 #if UNITY_EDITOR
     private void OnGUI()
     {
-        GUILayout.BeginArea( new Rect(8, 8, 300, 80) );
+        //GUILayout.BeginArea( new Rect(8, 8, 300, 80) );
         GUILayout.BeginVertical();
 
         GUILayout.TextArea(string.Format("Worm Speed: {0:N2}", speed));

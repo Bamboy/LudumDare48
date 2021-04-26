@@ -92,12 +92,17 @@ public class PlayerController : MonoBehaviour
             AudioSource.PlayClipAtPoint( impactAudios.GetRandom(), transform.position );
         }
     }
-
+    public bool isDead = false;
     private void OnTriggerEnter2D( Collider2D other )
     {
+        if( isDead )
+            return;
+
         if( other.tag == "Worm" )
         {
-            Debug.Log("Nom!");
+            Time.timeScale = 0;
+            Highscores.AddScore( Mathf.FloorToInt( TerrainController.Singleton.GetPlayerDistance() / 3f ) );
+            isDead = true;
         }
     }
 }
