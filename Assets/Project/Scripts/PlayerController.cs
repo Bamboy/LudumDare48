@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     public float maxAngle;
 
     public ParticleSystem boostParticles;
+    public Light2D boostLight;
 
     AudioSource audio;
     Rigidbody2D rb;
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         audio = GetComponent<AudioSource>();
 
+        boostLight.enabled = false;
         boostParticles.Stop();
     }
 
@@ -78,11 +80,13 @@ public class PlayerController : MonoBehaviour
             Vector2 dir = Quaternion.AngleAxis(transform.eulerAngles.z, Vector3.forward) * Vector2.up;
             rb.AddForce(dir * boostSpeed * thrustAxis * Time.deltaTime);
             boostParticles.Play();
+            boostLight.enabled = true;
         }
         else
         {
             rb.velocity = new Vector2(rb.velocity.x * horizontalDragFactor, rb.velocity.y);
             boostParticles.Stop();
+            boostLight.enabled = false;
         }
     }
     public AudioClip impactSingle;
